@@ -62,7 +62,7 @@ async function sendMessage() {
     addMessageToChat("user", userMessage);
 
     try {
-        const response = await fetch("https://whatsappgpt-l8n6.onrender.com", {
+        const response = await fetch("https://whatsappgpt-l8n6.onrender.com/ask", { // Actualiza con tu URL en Render
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
