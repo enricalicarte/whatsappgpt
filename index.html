@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot GPT</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="container">
+        <!-- Botón de menú hamburguesa -->
+        <button id="menu-toggle" aria-label="Abrir menú">
+            ☰
+        </button>
+        <aside id="sidebar">
+            <h2>Historial</h2>
+            <nav>
+                <ul id="brand-list">
+                    <li>
+                        <div class="brand-header" data-brand="Cumlaude">Cumlaude</div>
+                        <ul class="conversation-list hidden" id="Cumlaude-list"></ul>
+                    </li>
+                    <li>
+                        <div class="brand-header" data-brand="Rilastil">Rilastil</div>
+                        <ul class="conversation-list hidden" id="Rilastil-list"></ul>
+                    </li>
+                    <li>
+                        <div class="brand-header" data-brand="Sensilis">Sensilis</div>
+                        <ul class="conversation-list hidden" id="Sensilis-list"></ul>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        <main id="main-content">
+            <h1>Chat Vinculado a Marcas</h1>
+            <div id="search-box">
+                <input type="text" id="search-input" placeholder="Escribe tu mensaje aquí..." />
+                <button id="search-button">➔</button>
+                <button id="new-conversation-button">🔄</button>
+            </div>
+            <div id="chat-history">
+                <!-- Historial de chat actual -->
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
