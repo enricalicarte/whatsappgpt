@@ -10,8 +10,11 @@ load_dotenv()
 # Configura tu clave API de OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+print(f"OPENAI_API_KEY: {os.getenv('OPENAI_API_KEY')}")
+
+
 app = Flask(__name__)
-CORS(app)
+CORS(app)  # Configura CORS para permitir solicitudes de diferentes orígenes
 
 # Contextos específicos por marca
 assistant_contexts = {
@@ -53,7 +56,7 @@ def ask_gpt():
 
         # Llamar a la API de OpenAI
         response = openai.ChatCompletion.create(
-            model=assistant_id,  # Usar el ID del asistente correspondiente
+            model=assistant_id,
             messages=[
                 system_message,
                 {"role": "user", "content": prompt}
