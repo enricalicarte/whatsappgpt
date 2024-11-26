@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 import openai
 import os
 from dotenv import load_dotenv
-import os
 
 # Cargar las variables del archivo .env
 load_dotenv()
@@ -11,9 +10,6 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
-
-# Configura tu clave API de OpenAI desde una variable de entorno
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Contexto del asistente para cada marca
 assistant_contexts = {
@@ -39,9 +35,9 @@ def ask_gpt():
         # Contexto del sistema para la marca seleccionada
         system_message = {"role": "system", "content": assistant_contexts[brand]}
 
-        # Crear la solicitud a OpenAI usando el modelo gpt-4o
+        # Crear la solicitud a OpenAI usando el modelo gpt-4
         response = openai.ChatCompletion.create(
-            model="gpt-4o",  # Usa "gpt-4o-mini" si es necesario
+            model="gpt-4",  # Asegúrate de usar el modelo correcto según tu acceso
             messages=[
                 system_message,
                 {"role": "user", "content": prompt}
@@ -56,4 +52,6 @@ def ask_gpt():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Usar el puerto proporcionado por Render o el puerto por defecto 5000
+    port = int(os.getenv("PORT", 5000))
+    app.run(debug=True, host='0.0.0.0', port=port)
