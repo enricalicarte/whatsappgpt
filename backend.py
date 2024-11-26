@@ -4,20 +4,27 @@ import openai
 import os
 from dotenv import load_dotenv
 
-# Cargar las variables del archivo .env
+# Cargar variables del archivo .env
 load_dotenv()
 
-# Configurar la clave API de OpenAI
+# Configura tu clave API de OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
 CORS(app)
 
-# Asistentes asociados a cada marca
+# Contextos específicos por marca
+assistant_contexts = {
+    "Cumlaude": "Asistente experto en productos Cumlaude.",
+    "Rilastil": "Asistente experto en productos Rilastil.",
+    "Sensilis": "Asistente experto en productos Sensilis."
+}
+
+# IDs de los asistentes personalizados por marca
 assistant_ids = {
     "Cumlaude": "asst_YvXWL3CSeZFLrIa9PrqLNBD2",
-    # "Rilastil": "asst_YvXWL3CSeZFLrIa9PrqLNBD3",  # Comentado temporalmente
-    # "Sensilis": "asst_YvXWL3CSeZFLrIa9PrqLNBD4"   # Comentado temporalmente
+    "Rilastil": "asst_YLRcFQZNSosoKwMzzSMBHbL8",
+    "Sensilis": "asst_Uc7dJy3DPCcsGkKyeqCRbCUc"
 }
 
 @app.route("/", methods=["GET"])
@@ -25,35 +32,40 @@ def home():
     return "¡Bienvenido al backend de WhatsAppGPT!", 200
 
 @app.route("/ask", methods=["POST"])
-def ask_openai():
+def ask_gpt():
     try:
-        # Obtener datos del frontend
+        # Obtener datos del cuerpo de la solicitud
         data = request.get_json()
         prompt = data.get("prompt", "").strip()
-        brand = data.get("brand", "Cumlaude").strip()
+        brand = data.get("brand", "").strip()
 
-        if not prompt or brand not in assistant_ids:
-            return jsonify({"error": "Datos de solicitud inválidos"}), 400
+        if not prompt or not brand:
+            return jsonify({"error": "Faltan 'prompt' o 'brand' en la solicitud"}), 400
 
-        # Usar el asistente asociado a la marca seleccionada
+        if brand not in assistant_ids:
+            return jsonify({"error": f"Marca no válida: {brand}"}), 400
+
+        # Seleccionar el ID del asistente basado en la marca
         assistant_id = assistant_ids[brand]
-        print(f"Usando asistente: {assistant_id} para la marca {brand}")
 
-        # Realizar la consulta a OpenAI
+        # Configurar el mensaje de contexto
+        system_message = {"role": "system", "content": assistant_contexts[brand]}
+
+        # Llamar a la API de OpenAI
         response = openai.ChatCompletion.create(
-            model="gpt-4o-mini",  # Cambia el modelo si es necesario
-            messages=[{"role": "user", "content": prompt}],
-            functions=None,
-            function_call="none",
-            assistant_id=assistant_id
+            model=assistant_id,  # Usar el ID del asistente correspondiente
+            messages=[
+                system_message,
+                {"role": "user", "content": prompt}
+            ]
         )
 
-        # Devolver la respuesta al frontend
-        return jsonify({"response": response.choices[0].message["content"]})
+        # Extraer la respuesta del asistente
+        assistant_response = response["choices"][0]["message"]["content"]
+        return jsonify({"response": assistant_response})
 
     except Exception as e:
-        print(f"Error en el backend: {e}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000, debug=True)
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
