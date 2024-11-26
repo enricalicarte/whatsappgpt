@@ -4,15 +4,14 @@ import openai
 import os
 from dotenv import load_dotenv
 
-# Cargar variables del archivo .env
+# Cargar las variables del archivo .env
 load_dotenv()
 
-# Configurar la clave API de OpenAI
+# Configura tu clave API de OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Inicializar la app Flask
 app = Flask(__name__)
-CORS(app)  # Habilitar CORS para permitir solicitudes desde otros dominios
+CORS(app)
 
 # Contexto del asistente para cada marca
 assistant_contexts = {
@@ -20,6 +19,10 @@ assistant_contexts = {
     "Rilastil": "Asistente experto en productos Rilastil.",
     "Sensilis": "Asistente experto en productos Sensilis."
 }
+
+@app.route("/", methods=["GET"])
+def home():
+    return "¡Bienvenido al backend de WhatsAppGPT!", 200
 
 @app.route('/ask', methods=['POST'])
 def ask_gpt():
@@ -38,9 +41,9 @@ def ask_gpt():
         # Contexto del sistema para la marca seleccionada
         system_message = {"role": "system", "content": assistant_contexts[brand]}
 
-        # Crear la solicitud a OpenAI usando el modelo GPT
+        # Crear la solicitud a OpenAI usando el modelo gpt-4
         response = openai.ChatCompletion.create(
-            model="gpt-4",  # Cambia a "gpt-3.5-turbo" si no tienes acceso a GPT-4
+            model="gpt-4",
             messages=[
                 system_message,
                 {"role": "user", "content": prompt}
@@ -54,7 +57,6 @@ def ask_gpt():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 if __name__ == '__main__':
-    # Ejecutar en modo producción en el puerto proporcionado por Render
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host="0.0.0.0", port=10000, debug=True)
