@@ -13,10 +13,14 @@ app = Flask(__name__)
 
 # Contexto del asistente para cada marca
 assistant_contexts = {
-    "Cumlaude": "Asistente experto en productos Cumlaude.",
-    "Rilastil": "Asistente experto en productos Rilastil.",
-    "Sensilis": "Asistente experto en productos Sensilis."
+    "Cumlaude": "Eres un experto en productos Cumlaude. Proporciona respuestas claras y detalladas sobre los productos de esta marca.",
+    "Rilastil": "Eres un experto en productos Rilastil. Proporciona respuestas claras y detalladas sobre los productos de esta marca.",
+    "Sensilis": "Eres un experto en productos Sensilis. Proporciona respuestas claras y detalladas sobre los productos de esta marca."
 }
+
+@app.route('/')
+def home():
+    return "El backend está funcionando correctamente.", 200
 
 @app.route('/ask', methods=['POST'])
 def ask_gpt():
@@ -24,7 +28,7 @@ def ask_gpt():
         # Obtener datos de la solicitud
         data = request.get_json()
         prompt = data.get("prompt", "").strip()
-        brand = data.get("brand", "Cumlaude").strip()
+        brand = data.get("brand", "").strip()
 
         if not prompt or not brand:
             return jsonify({"error": "Faltan 'prompt' o 'brand' en la solicitud"}), 400
@@ -37,7 +41,7 @@ def ask_gpt():
 
         # Crear la solicitud a OpenAI usando el modelo gpt-4
         response = openai.ChatCompletion.create(
-            model="gpt-4",  # Asegúrate de usar el modelo correcto según tu acceso
+            model="gpt-4",
             messages=[
                 system_message,
                 {"role": "user", "content": prompt}
@@ -52,6 +56,4 @@ def ask_gpt():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    # Usar el puerto proporcionado por Render o el puerto por defecto 5000
-    port = int(os.getenv("PORT", 5000))
-    app.run(debug=True, host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=10000, debug=True)
